@@ -1,0 +1,82 @@
+strict graph  {
+node [style="rounded,filled" shape="rect" fontname="IBM Plex Sans"]
+edge [fontname="IBM Plex Sans"]
+layout="neato"
+overlap=f
+outputorder=edgesfirst
+ASMA [clique=4, fillcolor="#ba68c8"];
+ATN_MISMA_ENTIDAD [clique=2, fillcolor="#fff176"];
+CARDIOVASCULAR [clique=4, fillcolor="#ba68c8"];
+CLASIFICACION_FINAL [clique=4, fillcolor="#ba68c8"];
+DEFUNCION [clique=5, fillcolor="#64b5f6"];
+DIABETES [clique=4, fillcolor="#ba68c8"];
+EDAD [clique=5, fillcolor="#64b5f6"];
+EMBARAZO [clique=0, fillcolor="#e57373"];
+ENTIDAD_NAC [clique=1, fillcolor="#7986cb"];
+ENTIDAD_RES [clique=2, fillcolor="#fff176"];
+ENTIDAD_UM [clique=2, fillcolor="#fff176"];
+EPOC [clique=4, fillcolor="#ba68c8"];
+EPOCH_FECHA_DEF [clique=5, fillcolor="#64b5f6"];
+EPOCH_FECHA_INGRESO [clique=6, fillcolor="#ffb300"];
+EPOCH_FECHA_SINTOMAS [clique=6, fillcolor="#ffb300"];
+HABLA_LENGUA_INDIG [clique=3, fillcolor="#aed581"];
+HIPERTENSION [clique=4, fillcolor="#ba68c8"];
+INDIGENA [clique=3, fillcolor="#aed581"];
+INMUSUPR [clique=4, fillcolor="#ba68c8"];
+INTUBADO [clique=5, fillcolor="#64b5f6"];
+MIGRANTE [clique=1, fillcolor="#7986cb"];
+NACIONALIDAD [clique=1, fillcolor="#7986cb"];
+NEUMONIA [clique=3, fillcolor="#aed581"];
+OBESIDAD [clique=4, fillcolor="#ba68c8"];
+ORIGEN [clique=6, fillcolor="#ffb300"];
+OTRA_COM [clique=3, fillcolor="#aed581"];
+OTRO_CASO [clique=3, fillcolor="#aed581"];
+RENAL_CRONICA [clique=4, fillcolor="#ba68c8"];
+RESULTADO_ANTIGENO [clique=6, fillcolor="#ffb300"];
+RESULTADO_LAB [clique=6, fillcolor="#ffb300"];
+SECTOR [clique=2, fillcolor="#fff176"];
+SEXO [clique=0, fillcolor="#e57373"];
+TABAQUISMO [clique=4, fillcolor="#ba68c8"];
+TIPO_PACIENTE [clique=5, fillcolor="#64b5f6"];
+TOMA_MUESTRA_ANTIGENO [clique=5, fillcolor="#64b5f6"];
+TOMA_MUESTRA_LAB [clique=5, fillcolor="#64b5f6"];
+UCI [clique=5, fillcolor="#64b5f6"];
+VARIANTE [clique=6, fillcolor="#ffb300"];
+ASMA -- EPOC  [label="0.684", weight="0.684"];
+ASMA -- INMUSUPR  [label="0.683", weight="0.683"];
+ATN_MISMA_ENTIDAD -- ENTIDAD_RES  [label="0.561", weight="0.561"];
+CARDIOVASCULAR -- RENAL_CRONICA  [label="0.688", weight="0.688"];
+CARDIOVASCULAR -- EPOC  [label="0.683", weight="0.683"];
+CLASIFICACION_FINAL -- RESULTADO_ANTIGENO  [label="0.596", weight="0.596"];
+DEFUNCION -- EPOCH_FECHA_DEF  [label="1.0", weight="1.0"];
+DEFUNCION -- INTUBADO  [label="0.587", weight="0.587"];
+DIABETES -- HIPERTENSION  [label="0.722", weight="0.722"];
+EDAD -- HIPERTENSION  [label="0.268", weight="0.268"];
+EMBARAZO -- SEXO  [label="1.0", weight="1.0"];
+ENTIDAD_NAC -- NACIONALIDAD  [label="0.999", weight="0.999"];
+ENTIDAD_NAC -- ENTIDAD_RES  [label="0.825", weight="0.825"];
+ENTIDAD_RES -- ENTIDAD_UM  [label="0.974", weight="0.974"];
+ENTIDAD_UM -- TOMA_MUESTRA_ANTIGENO  [label="0.313", weight="0.313"];
+ENTIDAD_UM -- ORIGEN  [label="0.309", weight="0.309"];
+EPOCH_FECHA_INGRESO -- EPOCH_FECHA_SINTOMAS  [label="0.981", weight="0.981"];
+EPOCH_FECHA_SINTOMAS -- VARIANTE  [label="0.741", weight="0.741"];
+EPOCH_FECHA_SINTOMAS -- TOMA_MUESTRA_ANTIGENO  [label="0.654", weight="0.654"];
+HABLA_LENGUA_INDIG -- INDIGENA  [label="0.838", weight="0.838"];
+HIPERTENSION -- RENAL_CRONICA  [label="0.686", weight="0.686"];
+HIPERTENSION -- OBESIDAD  [label="0.677", weight="0.677"];
+INDIGENA -- NEUMONIA  [label="0.236", weight="0.236"];
+INMUSUPR -- OTRA_COM  [label="0.379", weight="0.379"];
+INTUBADO -- TIPO_PACIENTE  [label="1.0", weight="1.0"];
+MIGRANTE -- NACIONALIDAD  [label="0.953", weight="0.953"];
+NEUMONIA -- TIPO_PACIENTE  [label="0.624", weight="0.624"];
+NEUMONIA -- OTRA_COM  [label="0.522", weight="0.522"];
+OTRA_COM -- OTRO_CASO  [label="0.372", weight="0.372"];
+RENAL_CRONICA -- TABAQUISMO  [label="0.676", weight="0.676"];
+RESULTADO_ANTIGENO -- TOMA_MUESTRA_ANTIGENO  [label="1.0", weight="1.0"];
+RESULTADO_LAB -- TOMA_MUESTRA_LAB  [label="1.0", weight="1.0"];
+RESULTADO_LAB -- TOMA_MUESTRA_ANTIGENO  [label="0.814", weight="0.814"];
+RESULTADO_LAB -- TIPO_PACIENTE  [label="0.285", weight="0.285"];
+SECTOR -- TOMA_MUESTRA_ANTIGENO  [label="0.223", weight="0.223"];
+SEXO -- TABAQUISMO  [label="0.097", weight="0.097"];
+TIPO_PACIENTE -- UCI  [label="1.0", weight="1.0"];
+}
