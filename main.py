@@ -25,19 +25,11 @@ dataset = "arm.covid"
 CRAMER_THRESHOLD = 0.08
 PATHFINDER_R = 50
 P_VALUE_THRESHOLD = 0.001
-COVER_MODE = "c"
-APTITUDE_FN = ("susceptibility", "af_e", "absolute_risk")
-MEASURES = (
-    *APTITUDE_FN,
-    # "absolute_risk",
-    # "eer"
-    # "paf",
-    # "absolute_risk",
-    # "aptitude",
-    # "susceptibility",
-)
+COVER_MODE = "a"
+APTITUDE_FN = ("susceptibility", "paf")
+MEASURES = ("paf",)
 # OPTIMIZE = tuple(["max" for _ in MEASURES])
-OPTIMIZE = ("max", "max", "max")
+OPTIMIZE = ("max",)
 # OPTIMIZE = (
 #     # "min",
 #     "max",
@@ -45,7 +37,7 @@ OPTIMIZE = ("max", "max", "max")
 # )
 WORKERS = 6
 SEED = 0
-TOTAL_RUNS = 1
+TOTAL_RUNS = 20
 run_start = int(time.time())
 run_path = f"./results/{run_start}"
 os.makedirs(run_path, exist_ok=True)
@@ -94,209 +86,95 @@ yes_no_variables = [
 # ]
 
 # USE SEMANTIC GROUPS
-(semantic_groups, sg_pairs) = semantic_group_discovery(
-    dataset,
-    assoc_threshold=CRAMER_THRESHOLD,
-    pfnet_threshold=PATHFINDER_R,
-    p_value_threshold=P_VALUE_THRESHOLD,
-    workers=6,
-)
-# sg_pairs = [(j, i) for (i, j) in sg_pairs]
-
-# pd.DataFrame.from_dict(semantic_groups, orient="index").to_csv(
-#     f"{run_path}/groups.csv", index=False
-# )
-# print(semantic_groups)
-# print(sg_pairs)
-# pcas = pd.read_csv("./transformed.csv")
-# grouping = "label_6"
-
-# for (i, v) in enumerate(pcas[grouping].unique()):
-#     g = pcas[pcas[grouping] == v]["source"].unique()
-#     semantic_groups[i] = set(g)
-
-# all v all
-# semantic_groups = {
-#     # 5: ["oxidative", "hds", "temperatura", "funcion_de_bondad", "Mo", "Al2O3"],
-#     # 4: ["time", "O_S", "CoMo", "ionic_liquid", "Ni"],
-#     0: ["Mo", "Co", "CoMo", "W", "Fe", "V", "Ni"],
-#     1: ["oxidative", "extractive", "adsorptive", "porous"]
-#     # 3: ["POM", "per_S", "Co", "W", "reuse"],
-#     # 2: ["carbon_cat", "MOF", "Tisop", "extractive", "Ti_cat", "score_ox"],
-#     # 1: ["HPM", "MO", "adsorptive", "Fe", "MoHet"],
-#     # 0: ["porous", "complex_org", "V", "mat_d", "carbon", "SiO2"],
-# }
-
-# semantic_groups = {
-#     0: ["W", "Fe", "V", "Co", "Mo", "Ni", "CoMo", "Al2O3", "hds"],
-#     1: ["time", "temperatura", "reuse", "funcion_de_bondad", "oxidative", "O_S"],
-# }
-
-# semantic_groups = {
-#     0: ["coffee", "tea", "instant_coffee"],
-#     1: ["semi_finished_bread", "white_bread", "brown_bread",],
-# }
-# semantic_groups = {
-#     5: ["oxidative", "hds", "temperatura", "funcion_de_bondad", "Mo", "Al2O3"],
-#     4: ["time", "O_S", "CoMo", "ionic_liquid", "Ni"],
-# }
-
-# semantic_groups = {
-#     5: ["oxidative", "hds", "temperatura", "funcion_de_bondad"],
-#     4: ["Mo"],
-#     3: ["Al2O3", "time", "O_S", "CoMo", "ionic_liquid", "Ni"],
-#     2: ["POM", "per_S", "Co", "W", "reuse", "carbon_cat", "MOF", "Tisop", "extractive"],
-#     1: ["Ti_cat", "score_ox"],
-#     0: [
-#         "HPM",
-#         "MO",
-#         "adsorptive",
-#         "Fe",
-#         "MoHet",
-#         "porous",
-#         "complex_org",
-#         "V",
-#         "mat_d",
-#         "carbon",
-#         "SiO2",
-#     ],
-# }
-
-g_diseases = {
-    # "EDAD",
-    # "SEXO",
-    "HIPERTENSION",
-    "ASMA",
-    "CARDIOVASCULAR",
-    "DIABETES",
-    "HIPERTENSION",
-    "INMUSUPR",
-    "OBESIDAD",
-    "OTRA_COM",
-    "OTRO_CASO",
-    "RENAL_CRONICA",
-    "TABAQUISMO",
-    # "EMBARAZO",
-    "NEUMONIA",
-    "EPOC",
-    "CLASIFICACION_FINAL"
-    # "EDAD",
-    # "SEXO",
-}
-g_intervals = {
-    # "EPOCH_FECHA_SINTOMAS",
-    # "EPOCH_FECHA_DEF",
-    # "EPOCH_FECHA_INGRESO",
-    "INTERVAL_FECHA_SINTOMAS_FECHA_INGRESO",
-    "INTERVAL_FECHA_INGRESO_FECHA_DEF",
-    "INTERVAL_FECHA_SINTOMAS_FECHA_DEF",
-}
-g_age_sex = {"EDAD", "SEXO"}
-g_location = {
-    "ENTIDAD_UM",
-    # "ENTIDAD_NAC",
-    # "ENTIDAD_RES",
-    # "ATN_MISMA_ENTIDAD",
-}
-g_tests = {
-    "TOMA_MUESTRA_ANTIGENO",
-    "TOMA_MUESTRA_LAB",
-    "RESULTADO_LAB",
-    "RESULTADO_ANTIGENO",
-    "CLASIFICACION_FINAL"
-    # "DEFUNCION",
-}
-g_demographics = {
-    # "INDIGENA",
-    # "HABLA_LENGUA_INDIG",
-    # "MIGRANTE",
-    # "NACIONALIDAD",
-    "EDAD",
-    "SEXO",
-}
-
-g_seriousness = {
-    "DEFUNCION",
-    "INTUBADO",
-    "UCI",
-    "TIPO_PACIENTE",
-    # "CLASIFICACION_FINAL",
-}
-
-g_health_facility = {
-    "SECTOR",
-    # "ORIGEN"
-}
-
-g_all = (
-    g_age_sex.union(g_intervals)
-    .union(g_location)
-    .union(g_tests)
-    .union(g_seriousness)
-    .union(g_health_facility)
-    .union(g_diseases)
-)
-
-g_all_c = {"NACIONALIDAD"}
-
-# sg_pairs = [
-#     (
-#         {"Anxiety", "Peer_Pressure", "Genetics", "Allergy",},
-#         {
-#             "Smoking",
-#             "Lung_cancer",
-#             "Car_Accident",
-#             "Yellow_Fingers",
-#             "Coughing",
-#             "Fatigue",
-#             "Attention_Disorder",
-#         },
-#     )
-# ]
-
-# sg_pairs = [
-#     # (g_demographics, g_diseases),
-#     (
-#         {
-#             "HIPERTENSION",
-#             "DIABETES",
-#             "NEUMONIA"
-#             # "SECTOR",
-#             # "INTERVAL_FECHA_SINTOMAS_FECHA_INGRESO",
-#             # "ENTIDAD_UM",
-#             # "ENTIDAD_RES",
-#             # "ATN_MISMA_ENTIDAD",
-#         },
-#         {
-#             "DEFUNCION",
-#             "VARIANTE"
-#             # "UCI",
-#             # "TOMA_MUESTRA_LAB",
-#             # "TOMA_MUESTRA_ANTIGENO",
-#             # "TIPO_PACIENTE",
-#             # "INTUBADO",
-#             # "INTERVAL_FECHA_SINTOMAS_FECHA_DEF",
-#             # "DEFUNCION",
-#             # "EDAD",
-#             # "DEFUNCION",
-#             # "EPOCH_FECHA_DEF",
-#             # "INTERVAL_FECHA_INGRESO_FECHA_DEF",
-#         },
-#     ),
-#     # (g_location, g_tests,),
-# ]
-# sg_pairs += [(j, i) for (i, j) in sg_pairs]
-
-# yes_no_variables = [*sg_pairs[0][0], *sg_pairs[0][1]]
-# sg_pairs = [(semantic_groups[0], semantic_groups[1])]
-
 # (semantic_groups, sg_pairs) = semantic_group_discovery(
 #     dataset,
 #     assoc_threshold=CRAMER_THRESHOLD,
 #     pfnet_threshold=PATHFINDER_R,
 #     p_value_threshold=P_VALUE_THRESHOLD,
-#     workers=6,
+#     workers=8,
 # )
+
+g_location = {"ENTIDAD_UM", "ATN_MISMA_ENTIDAD"}
+g_health_facility = {"INTUBADO", "UCI", "DEFUNCION", "TIPO_PACIENTE"}
+g_demographics = {
+    "EDAD",
+    "SEXO",
+}
+g_tests = {
+    "TOMA_MUESTRA_ANTIGENO",
+    "TOMA_MUESTRA_LAB",
+    "RESULTADO_ANTIGENO",
+    "RESULTADO_LAB",
+}
+g_diseases = {
+    "CLASIFICACION_FINAL",
+    "ASMA",
+    "CARDIOVASCULAR",
+    "DIABETES",
+    "EPOC",
+    "HIPERTENSION",
+    "INMUSUPR",
+    "NEUMONIA",
+    "OBESIDAD",
+    "RENAL_CRONICA",
+    "TABAQUISMO",
+}
+g_a_diseases = {
+    "TABAQUISMO",
+    "OBESIDAD",
+    "RENAL_CRONICA",
+    "ASMA",
+    "EPOC",
+    "DIABETES",
+    "INMUSUPR",
+    "CLASIFICACION_FINAL",
+    "HIPERTENSION",
+    "CARDIOVASCULAR",
+    "NEUMONIA",
+}
+g_a_seriousness = {
+    "EDAD",
+    "UCI",
+    "INTUBADO",
+    "EPOCH_FECHA_DEF",
+    "DEFUNCION",
+    "TOMA_MUESTRA_LAB",
+    "TOMA_MUESTRA_ANTIGENO",
+    "TIPO_PACIENTE",
+}
+g_a_tests = {
+    "RESULTADO_ANTIGENO",
+    "RESULTADO_LAB",
+    "EPOCH_FECHA_SINTOMAS",
+    "VARIANTE",
+    "ORIGEN",
+    "EPOCH_FECHA_INGRESO",
+}
+
+g_a_location = {"ENTIDAD_UM", "ENTIDAD_RES", "ATN_MISMA_ENTIDAD"}
+
+g_a_others = {"NEUMONIA", "OTRA_COM", "INDIGENA", "HABLA_LENGUA_INDIG", "OTRO_CASO"}
+
+g_a_health_facility = {"SECTOR", "NACIONALIDAD", "MIGRANTE"}
+
+sg_pairs = [
+    # (g_diseases, g_health_facility)
+    # (g_health_facility, g_diseases),
+    # (g_demographics, g_diseases)
+    (g_diseases, g_demographics,)
+    # (g_location, g_tests)
+    # (g_demographics, g_health_facility),
+    # (g_demographics, g_diseases),
+    # (g_location, g_health_facility),
+    # (g_a_diseases, g_a_seriousness),
+    # (g_a_location, g_a_tests),
+    # (g_a_others, g_a_seriousness),
+]
+# acc = []
+# for g in sg_pairs:
+#     acc += [g, (g[1], g[0])]
+# sg_pairs = acc
+
 df_sg_pairs = pd.DataFrame(sg_pairs)
 df_sg_pairs.to_csv(f"{run_path}/semantic_group_pairs.csv")
 
@@ -341,7 +219,7 @@ def do_run(args, constants):
         dataframe=dataset,
         exec_run_path=exec_run_path,
         covariates=(),
-        pop_size=50,
+        pop_size=30,
         stop_condition=("n_gen", 30),
         omit=(),
         antecedent=(1, len(a)),
@@ -365,10 +243,10 @@ def do_run(args, constants):
                 ),
                 ("remove", ("?",),),
             ),
-            (("ATN_MISMA_ENTIDAD",), ("keep", (2,))),
+            # (("ATN_MISMA_ENTIDAD",), ("keep", (2,))),
             (("INTUBADO", "UCI"), ("keep", (1,))),
-            (("DEFUNCION",), ("keep", (1,))),
-            (("CLASIFICACION_FINAL",), ("keep", (3, 6, 7))),
+            (("DEFUNCION",), ("keep", (1, 2))),
+            # (("CLASIFICACION_FINAL",), ("keep", (3, 6, 7))),
         ),
     )
 
@@ -477,20 +355,22 @@ def do_run(args, constants):
 
 
 # generate seeds
-seeds = random.sample(range(1, 100), TOTAL_RUNS)
+seeds = range(1, TOTAL_RUNS + 1)
 run_inputs = itertools.product(enumerate(seeds), enumerate([p for p in sg_pairs]))
 
-pool = Pool(6)
+pool = Pool()
 mapped = pool.map(functools.partial(do_run, constants=base_constants), run_inputs)
 
 df_finals = pd.concat(mapped)
 
 cols = [
     "repr",
+    "sg_pair",
+    "seed",
     *(["level"] if len(MEASURES) > 1 else []),
     "aptitude",
     "absolute_risk",
-    "r_absolute_risk",
+    # "r_absolute_risk",
     "af_e",
     "paf",
     "support",
@@ -500,7 +380,7 @@ cols = [
     "antecedent_support",
     "consequent_support",
     "relative_risk",
-    "r_confidence",
+    # "r_confidence",
     # "cer",
     # "r_cer",
     # "tp",
@@ -514,7 +394,6 @@ cols = [
     "diversity",
     "antecedent_size",
     "consequent_size",
-    "sg_pair",
     # "is_n_closed",
     # "has_redundant_selectors",
     # "repr_redundant_sels",

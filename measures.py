@@ -312,7 +312,7 @@ def do_evaluate_rule(table, rule):
 
     else:
         end = time.time()
-        # print(f"{round(end - start, 4)}s\t{repr_rule(rule)}")
+        print(f"{round(end - start, 4)}s\t{repr_rule(rule)}")
         evaluation = apply_evaluation(table, rule)
         to_redis(alias, evaluation)
         return evaluation
@@ -324,8 +324,8 @@ def evaluate_rule(ctx: Context, rule):
     ev = do_evaluate_rule(ctx.dataframe, rule)
     rev = do_evaluate_rule(ctx.dataframe, (b, a))
 
-    ar = ev["absolute_risk"]
-    r_ar = rev["absolute_risk"]
+    # ar = ev["absolute_risk"]
+    # r_ar = rev["absolute_risk"]
 
     acc = {**ev}
 
@@ -339,7 +339,7 @@ def evaluate_rule(ctx: Context, rule):
                 m <= 0.0000001
                 for m in [
                     acc["absolute_risk_abs"],
-                    acc["r_absolute_risk_abs"],
+                    # acc["r_absolute_risk_abs"],
                     ev["full_support"],
                     *[acc[v] for v in ctx.aptitude_fn],
                 ]

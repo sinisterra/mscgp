@@ -238,7 +238,7 @@ def evolve_t(ctx, state, start_time):
     time_df["context"] = ctx.id
     time_df = time_df[["event", "duration", "rules"]]
     time_df["duration"] = time_df["duration"].round(4)
-    # print(tabulate(time_df, headers="keys", tablefmt="psql"))
+    print(tabulate(time_df, headers="keys", tablefmt="psql"))
 
     is_mono = len(ctx.measures) == 1
     # print(final_population[["repr", "absolute_risk_rev"]])
@@ -284,9 +284,12 @@ def evolve_t(ctx, state, start_time):
         # "susceptibility",
         *ctx.aptitude_fn,
         "aptitude",
+        "significant",
+        "absolute_risk",
+        "full_support"
         # "absolute_risk_abs",
-        "full_support",
-        "prevalence"
+        # "full_support",
+        # "prevalence"
         # "cer",
         # "absolute_risk",
         # "af_e",

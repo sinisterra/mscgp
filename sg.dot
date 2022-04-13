@@ -1,0 +1,5 @@
+digraph D {
+  "edad, sexo, tipo_paciente" -> enfermedades
+  "ubicacion" -> "sector, uci, intubado, defuncion"
+  "enfermedades" -> "sector, uci, intubado, defuncion"
+}

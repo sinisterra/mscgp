@@ -4,8 +4,14 @@ import networkx as nx
 from networkx.drawing.nx_pydot import write_dot
 from semantic_group_discovery import find_clique_cover
 from networkx.algorithms import bipartite
+from scipy.stats import skew, kurtosis
+from tabulate import tabulate
 
-dfch = pd.read_csv("./assoc_full.csv")
+dfch = pd.read_csv("./assoc_full.csv").query("a1 != 'index' and a2 != 'index'")
+
+dfch["key"] = dfch.apply(lambda r: tuple(sorted([r["a1"], r["a2"]])), axis=1)
+dfdedup = dfch.drop_duplicates(subset=["key"])
+print(f"Total de aristas: {len(dfdedup)}")
 
 dfch2 = dfch.query("significant == True")
 distinct_cramer = sorted(list(dfch2["cramer"].unique()))
@@ -77,7 +83,8 @@ for k in [*sources.keys(), *targets.keys()]:
     tk = targets[k]
     sts[k] = min(len(sk), len(tk))
 
-print(sts)
+for (i, ((s, t), v)) in enumerate(sts.items()):
+    print(f"| {i+1} | {s} | {t} | {v} |")
 # %%
 g_spanning = nx.Graph()
 for ((s, t), v) in between_pairs.items():
@@ -103,5 +110,27 @@ for (k, v) in cc.items():
     subg = cut.subgraph(v)
     if len(subg.nodes) > 1:
         print(k, nx.min_edge_cover(subg))
+
+# %%
+dfdedup
+
+# %%
+print(f"Asimetría: {skew(dfdedup['cramer'])}\n Curtosis: {kurtosis(dfdedup['cramer'])}")
+
+
+# %%
+print(f"Total de aristas eliminadas = {len(dfdedup.query('cramer < 0.08'))}")
+
+6  # %%
+
+# %%
+print(
+    tabulate(
+        pd.read_csv("./sg_groups.csv"),
+        headers="keys",
+        showindex="never",
+        tablefmt="github",
+    )
+)
 
 # %%

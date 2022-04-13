@@ -6,6 +6,7 @@ from scipy.stats import zscore
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 
+# sns.set(rc={"figure.figsize": (11, 8.5)})
 table = "arm.covid"
 # por cada selector, determinar cuántos
 
@@ -21,6 +22,7 @@ group = [
         "INTERVAL_FECHA_SINTOMAS_FECHA_DEF",
         "INTERVAL_FECHA_SINTOMAS_FECHA_INGRESO",
         "ENTIDAD_NAC",
+        "VARIANTE",
     ]
 ]
 
@@ -31,7 +33,8 @@ df_groups["Attributes"] = df_groups["Attributes"].apply(lambda v: eval(v))
 
 
 group_list = list(df_groups["Attributes"])
-# [
+# group_list = [
+#     ["EDAD", "SEXO"],
 #     [
 #         "DIABETES",
 #         "HIPERTENSION",
@@ -45,7 +48,35 @@ group_list = list(df_groups["Attributes"])
 #         "OTRA_COM",
 #         "OBESIDAD",
 #         "CLASIFICACION_FINAL",
+#         "NEUMONIA",
 #     ],
+#     ["DEFUNCION", "TIPO_PACIENTE", "INTUBADO", "UCI"],
+#     ["ENTIDAD_UM", "ATN_MISMA_ENTIDAD", "ENTIDAD_RES"],
+#     [
+#         "TOMA_MUESTRA_ANTIGENO",
+#         "TOMA_MUESTRA_LAB",
+#         "RESULTADO_ANTIGENO",
+#         "RESULTADO_LAB",
+#     ],
+# ]
+# group_list = [
+#     ["EDAD", "SEXO"],
+#     [
+#         "DIABETES",
+#         "HIPERTENSION",
+#         "CARDIOVASCULAR",
+#         "EPOC",
+#         "ASMA",
+#         "TABAQUISMO",
+#         "INMUSUPR",
+#         "OTRO_CASO",
+#         "RENAL_CRONICA",
+#         "OTRA_COM",
+#         "OBESIDAD",
+#         "CLASIFICACION_FINAL",
+#         "NEUMONIA",
+#     ],
+# ]
 #     [
 #         "DEFUNCION",
 #         "EDAD",
@@ -105,8 +136,10 @@ df["zscore_count"] = zscore(df["count"])
 plt.figure(figsize=(8.5, 11))
 order = [c for c in list(sort_order.index) if c not in ["index"]][::-1]
 ax = sns.boxplot(
-    data=df, y="attribute", x="count_pct", orient="h", order=order, color="#999"
+    data=df, y="attribute", x="count_pct", orient="h", order=order, color="#7887c2",
 )
+ax.set(xlabel="Percentil de soporte", ylabel="Atributo")
+plt.savefig("./charts/boxplot_soporte_pct.pdf", dpi=300, bbox_inches="tight")
 # %%
 plt.figure(figsize=(8.5, 11))
 ax = sns.boxplot(
@@ -155,4 +188,12 @@ sns.jointplot(data=sa, x="n_selectors", y="n_attributes")
 # %%
 print(tabulate(sa, headers="keys", tablefmt="github",))
 
+# %%
+df_describe["count"] = df_describe["count"] + 1
+df_describe
+
+# %%
+l = df_describe.groupby("group").prod().astype(int)
+l["count"] = l["count"] - 1
+l
 # %%

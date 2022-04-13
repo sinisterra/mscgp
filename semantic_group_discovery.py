@@ -116,6 +116,7 @@ def build_attribute_network(df, assoc_threshold=0.1, p_value_threshold=0.1, work
             "INTERVAL_FECHA_SINTOMAS_FECHA_DEF",
             "INTERVAL_FECHA_INGRESO_FECHA_DEF",
             "INTERVAL_FECHA_SINTOMAS_FECHA_INGRESO",
+            "VARIANTE",
         ]
     ]
     pairs = list(combinations(columns, 2))
