@@ -27,9 +27,9 @@ PATHFINDER_R = 50
 P_VALUE_THRESHOLD = 0.001
 COVER_MODE = "a"
 APTITUDE_FN = ("susceptibility", "paf")
-MEASURES = ("paf",)
+MEASURES = ("absolute_risk",)
 # OPTIMIZE = tuple(["max" for _ in MEASURES])
-OPTIMIZE = ("max",)
+OPTIMIZE = ("min",)
 # OPTIMIZE = (
 #     # "min",
 #     "max",
@@ -37,7 +37,7 @@ OPTIMIZE = ("max",)
 # )
 WORKERS = 6
 SEED = 0
-TOTAL_RUNS = 20
+TOTAL_RUNS = 1
 run_start = int(time.time())
 run_path = f"./results/{run_start}"
 os.makedirs(run_path, exist_ok=True)
@@ -160,8 +160,8 @@ g_a_health_facility = {"SECTOR", "NACIONALIDAD", "MIGRANTE"}
 sg_pairs = [
     # (g_diseases, g_health_facility)
     # (g_health_facility, g_diseases),
-    # (g_demographics, g_diseases)
-    (g_diseases, g_demographics,)
+    (g_demographics, g_diseases)
+    # (g_diseases, g_demographics,)
     # (g_location, g_tests)
     # (g_demographics, g_health_facility),
     # (g_demographics, g_diseases),

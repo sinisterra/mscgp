@@ -7,18 +7,18 @@ import pandas as pd
 
 table = "arm.covid"
 selectors = {}
-antecedent = [""]
+antecedent = ["EDAD", "SEXO"]
 consequent = [
     "HIPERTENSION",
     "DIABETES",
-    # "CLASIFICACION_FINAL",
+    "NEUMONIA",
+    "CLASIFICACION_FINAL",
     # "EPOC",
-    # "NEUMONIA",
     # "TABAQUISMO",
     # "ASMA",
-    "CARDIOVASCULAR",
+    # "CARDIOVASCULAR",
     # "INMUSUPR",
-    "OBESIDAD",
+    # "OBESIDAD",
     # "RENAL_CRONICA",
     # "TABAQUISMO",
 ]
@@ -26,7 +26,7 @@ consequent = [
 attrs = get_selectors(table)
 
 for e in consequent:
-    attrs[e] = [(a, b) for (a, b) in attrs[e] if b in [2]]
+    attrs[e] = [(a, b) for (a, b) in attrs[e] if b in [1]]
 
 
 antecedents_with_none = itertools.product(*[attrs[a] + ["none"] for a in antecedent])
