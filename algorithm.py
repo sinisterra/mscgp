@@ -5,6 +5,9 @@ from dsl import AlgorithmState, Context
 import termplotlib as tpl
 from elitism_op import do_elitism, do_mo_elitism, do_selector_elitism, do_single_elitism
 from filtering_op import do_filtering, do_max_filtering
+import numpy as np
+import pygmo as pg
+from scipy.stats import zscore
 from mutation_op import (
     do_contraction_mutation,
     do_extension_mutation,
@@ -89,18 +92,70 @@ def make_initial_state(ctx: Context):
     return new_state
 
 
-def stop_condition_met(ctx, state):
+def check_convergence(ctx: Context, state):
     (stop_criteria, stop_value) = ctx.stop_condition
-    stop_criteria_options = ["n_eval", "n_gen"]
+
+    generations = sorted(state.history["generation"].unique())
+
+    last_n_generations = [
+        g for g in generations[-(min(stop_value, len(generations))) :] if g >= 0
+    ]
+
+    if len(ctx.measures) > 1:
+        acc_hv = []
+
+        for g in last_n_generations:
+            if "level" not in state.population.columns:
+                continue
+            # print(state.pop_history["level"])
+            pareto = state.population.query(f"generation == {g} and level == 1")[
+                list(ctx.measures)
+            ]
+
+            print(pareto)
+
+            for (m, d) in zip(list(ctx.measures), list(ctx.optimize)):
+                if d == "max":
+                    pareto[m] = -pareto[m]
+
+            print(pareto.values.tolist())
+
+            hv_value = pg.hypervolume(pareto.values.tolist())
+            acc_hv.append(hv_value)
+
+        print("hypervolumes", np.std(acc_hv))
+        return False
+
+        # obtener los ultimos n de la población élite
+    acc_elites = []
+    for g in last_n_generations:
+        gen_pop = state.pop_history.query(f"generation == {g}")
+        acc_elites.append(gen_pop[ctx.measures[0]].max())
+
+    std = round(np.std(acc_elites), 4)
+    print(f"[{state.generation}] CONVERGENCE CHECK {std}")
+    if len(generations) < stop_value:
+        return False
+    return std < 0.0005
+
+
+def stop_condition_met(ctx, state):
+    stop_criteria = ctx.stop_condition[0]
+    stop_criteria_options = ["n_eval", "n_gen", "check_convergence"]
     if stop_criteria not in stop_criteria_options:
         raise Exception(
             f"StopCriteria error, '{stop_criteria}' not in {stop_criteria_options}"
         )
 
+    if "check_convergence" == stop_criteria:
+        return check_convergence(ctx, state)
+
     if "n_eval" == stop_criteria:
+        (stop_criteria, stop_value) = ctx.stop_condition
         return state.evaluations > stop_value
 
     if "n_gen" == stop_criteria:
+        (stop_criteria, stop_value) = ctx.stop_condition
         return state.generation > stop_value
 
     return False
@@ -130,7 +185,16 @@ def evolve_t(ctx, state, start_time):
     after_contraction = do_contraction_mutation(ctx, state, state_population)
     contraction_end = time.time()
 
-    from_operators = [*after_crossover, *after_single_extension, *after_contraction]
+    value_mutation_start = time.time()
+    after_value_mutation = do_value_mutation(ctx, state, state_population)
+    value_mutation_end = time.time()
+
+    from_operators = [
+        *after_crossover,
+        *after_single_extension,
+        *after_contraction,
+        *after_value_mutation,
+    ]
     rules_to_evaluate = set(
         [
             *state_population,
@@ -222,6 +286,11 @@ def evolve_t(ctx, state, start_time):
                 "event": "MUTATE_CONTRACTION",
                 "duration": contraction_end - contraction_start,
                 "rules": len(after_contraction),
+            },
+            {
+                "event": "MUTATE_REPLACE",
+                "duration": value_mutation_end - value_mutation_start,
+                "rules": len(after_value_mutation),
             },
             {
                 "event": "EVALUATION",

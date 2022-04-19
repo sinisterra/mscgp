@@ -1,8 +1,11 @@
 import multiprocessing
+from turtle import clear
+
+from matplotlib.cbook import ls_mapper
 from validation_op import attributes_must_be_unique
 from dsl import Context, AlgorithmState
 from measures import evaluate_rule
-from rule_repr import format_for_population, repr_rule
+from rule_repr import format_for_population, repr_rule, repr_selector
 from restrictions import enforce_restrictions
 import pandas as pd
 import random
@@ -226,7 +229,7 @@ def do_attribute_mutation(ctx: Context, state: AlgorithmState, population):
     return pd.DataFrame(mutated)
 
 
-def do_value_mutation(ctx: Context, state: AlgorithmState, population):
+def do_value_mutation_(ctx: Context, state: AlgorithmState, population):
     for_mutation = population.sample(frac=1)
     p_selector_mutation = 0.5
     new_rules_discovered = 0
@@ -361,6 +364,54 @@ def do_single_extension_mutation(ctx: Context, state: AlgorithmState, population
         mutated.append(new_rule)
         # evaluation = evaluate_rule(ctx, new_rule)
         # if enforce_restrictions(evaluation):
+
+    return mutated
+
+
+def do_value_mutation(ctx: Context, state: AlgorithmState, population):
+    mutated = []
+    for r in population:
+        (antecedent, consequent) = r
+
+        acc = []
+        # se crea una tupla para saber a qué parte de la regla corresponde cada selector
+        for a in antecedent:
+            acc.append(("a", a))
+        for c in consequent:
+            acc.append(("c", c))
+
+        # elegir un selector aleatorio
+        random_selector = random.choice(acc)
+
+        # descomponer en atributo y valor
+        (_, (attribute, value)) = random_selector
+
+        # crear dos listas en las que se acumularán los selectores
+        na = []
+        nc = []
+
+        # crear una lista exclyendo al selector siendo mutado
+        new_selector_options = [
+            (attr, val) for (attr, val) in state.selectors[attribute] if val != value
+        ]
+
+        # si es el único valor, excluir
+        if len(new_selector_options) == 0:
+            continue
+
+        new_selector = random.choice(new_selector_options)
+
+        # iterar por la lista de selectores, agregar a la lista acumuladora si
+        # aún no se ha reemplazado
+        for (p, t) in acc:
+            if p == "a":
+                na.append(new_selector if t == random_selector[1] else t)
+            if p == "c":
+                nc.append(new_selector if t == random_selector[1] else t)
+
+        new_rule = (tuple(na), tuple(nc))
+
+        mutated.append(new_rule)
 
     return mutated
 

@@ -26,10 +26,10 @@ CRAMER_THRESHOLD = 0.08
 PATHFINDER_R = 50
 P_VALUE_THRESHOLD = 0.001
 COVER_MODE = "a"
-APTITUDE_FN = ("susceptibility", "paf")
-MEASURES = ("absolute_risk",)
-# OPTIMIZE = tuple(["max" for _ in MEASURES])
-OPTIMIZE = ("min",)
+APTITUDE_FN = ("absolute_risk", "r_absolute_risk")
+MEASURES = (*APTITUDE_FN,)
+OPTIMIZE = tuple(["max" for _ in MEASURES])
+# OPTIMIZE = ("max",)
 # OPTIMIZE = (
 #     # "min",
 #     "max",
@@ -219,8 +219,8 @@ def do_run(args, constants):
         dataframe=dataset,
         exec_run_path=exec_run_path,
         covariates=(),
-        pop_size=30,
-        stop_condition=("n_gen", 30),
+        pop_size=50,
+        stop_condition=("check_convergence", 30),
         omit=(),
         antecedent=(1, len(a)),
         consequent=(1, len(b)),

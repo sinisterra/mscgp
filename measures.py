@@ -369,7 +369,7 @@ def evaluate_rule(ctx: Context, rule):
             # "has_redundant_selectors": all(
             #     [rule_support != s[0] and s[0] > 0 for s in subsets]
             # ),
-            "aptitude": aptitude
+            "aptitude": abs(acc["absolute_risk"])
             # "aptitude": ((1 / (1 + acc["prevalence_threshold_diff"])) * acc["paf"])
             # ** (0.5)
             # "aptitude": aptitude,
