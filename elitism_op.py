@@ -6,8 +6,8 @@ from nds import nds
 import pandas as pd
 from validation_op import do_validation, validate_rule
 
-# restriction_expr = "tp > 0 and significant == True and odds >= 1 and absolute_risk > 0"
-restriction_expr = "tp > 0"
+restriction_expr = "tp > 0 and significant == True and odds >= 1 and absolute_risk > 0"
+# restriction_expr = "tp > 0"
 
 
 def do_selector_elitism(ctx: Context, population):

@@ -2,7 +2,7 @@ def enforce_restrictions(evaluation):
     return (
         True
         and evaluation["tp"] >= 1
-        # and evaluation["absolute_risk"] > 0
+        and evaluation["absolute_risk"] > 0
         #         and (evaluation["has_redundant_selectors"] == False)
         # and evaluation["is_n_closed"]
         # and evaluation["support"] > 0

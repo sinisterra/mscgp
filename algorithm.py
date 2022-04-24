@@ -19,7 +19,7 @@ from mutation_op import (
     do_single_extension_mutation,
 )
 from tabulate import tabulate
-
+import plotille
 
 import random
 from population_init import make_population, make_two_by_two_pop
@@ -103,40 +103,61 @@ def check_convergence(ctx: Context, state):
 
     if len(ctx.measures) > 1:
         acc_hv = []
-
+        xs = []
+        ys = []
+        stds = []
         for g in last_n_generations:
             if "level" not in state.population.columns:
                 continue
             # print(state.pop_history["level"])
-            pareto = state.population.query(f"generation == {g} and level == 1")[
-                list(ctx.measures)
-            ]
+            pareto = state.elites.query(f"generation == {g} and level == 1")
+            dfpareto = pareto[["repr", "level", *ctx.measures, "generation"]]
+            # print(tabulate(dfpareto, headers="keys"))
+            hv_value = pg.hypervolume(
+                pareto[list(ctx.measures)].values.tolist()
+            ).compute([1.1, 1.1])
+            acc_hv.append(round(hv_value, 4))
+            stds.append(np.std(acc_hv))
 
-            print(pareto)
+            xs.append(g)
+            ys.append(hv_value)
 
-            for (m, d) in zip(list(ctx.measures), list(ctx.optimize)):
-                if d == "max":
-                    pareto[m] = -pareto[m]
-
-            print(pareto.values.tolist())
-
-            hv_value = pg.hypervolume(pareto.values.tolist())
-            acc_hv.append(hv_value)
-
-        print("hypervolumes", np.std(acc_hv))
-        return False
+        std = np.std(acc_hv)
+        print(f"[{state.generation}] hypervolumes std = {std}",)
+        # fig.plot(xs, stds, label="std")
+        print(plotille.plot(xs, acc_hv, width=120, height=16, origin=False))
+        # print(plotille.plot(xs, ys))
+        # fig = tpl.figure()
+        # fig.plot(xs, stds, label="std")
+        # fig.plot(xs, ys, label="hv")
+        # fig.show()
+        if len(generations) < stop_value:
+            return False
+        return std <= 0.0001
 
         # obtener los ultimos n de la población élite
     acc_elites = []
+    xs = []
+    ys = []
+    stds = []
     for g in last_n_generations:
         gen_pop = state.pop_history.query(f"generation == {g}")
-        acc_elites.append(gen_pop[ctx.measures[0]].max())
+        y = gen_pop[ctx.measures[0]].max()
+        acc_elites.append(y)
+        stds.append(round(np.std(acc_elites), 4))
+        xs.append(g)
+        ys.append(y)
+
+    # fig.plot(xs, stds, label="std")
+    print(plotille.plot(xs, stds, width=120, height=16, origin=False))
 
     std = round(np.std(acc_elites), 4)
     print(f"[{state.generation}] CONVERGENCE CHECK {std}")
+
     if len(generations) < stop_value:
         return False
-    return std < 0.0005
+
+    return std <= 0.0001
 
 
 def stop_condition_met(ctx, state):

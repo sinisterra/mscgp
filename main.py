@@ -17,6 +17,7 @@ from scipy.stats import gmean
 from nds import nds
 from tabulate import tabulate
 
+
 random.seed(42)
 numpy.random.seed(42)
 
@@ -26,7 +27,7 @@ CRAMER_THRESHOLD = 0.08
 PATHFINDER_R = 50
 P_VALUE_THRESHOLD = 0.001
 COVER_MODE = "a"
-APTITUDE_FN = ("absolute_risk", "r_absolute_risk")
+APTITUDE_FN = ("support", "confidence")
 MEASURES = (*APTITUDE_FN,)
 OPTIMIZE = tuple(["max" for _ in MEASURES])
 # OPTIMIZE = ("max",)
@@ -220,7 +221,7 @@ def do_run(args, constants):
         exec_run_path=exec_run_path,
         covariates=(),
         pop_size=50,
-        stop_condition=("check_convergence", 30),
+        stop_condition=("check_convergence", 50),
         omit=(),
         antecedent=(1, len(a)),
         consequent=(1, len(b)),
