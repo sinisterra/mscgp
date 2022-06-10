@@ -108,14 +108,15 @@ for attribute in group:
         f"SELECT {attribute}, count(*) as cnt from {table} GROUP BY {attribute}"
     )
     res = [
-        {"attribute": attribute, "value": v, "count": c, "count_norm": c / N}
+        {"attribute": attribute, "value": v, "count": c, "count_norm": (c / N) * 100}
         for (v, c) in r
     ]
     acc += res
 
 df = pd.DataFrame(acc)
 # df = df[~df["value"].isin([97, 98, 99])]
-df = df.sort_values("count", ascending=False).query("attribute != 'index'")
+df = df.sort_values("count", ascending=False).query("attribute != 'index'").round(4)
+df.to_csv("./supports.csv", index=False)
 df
 
 # %%
@@ -193,7 +194,7 @@ df_describe["count"] = df_describe["count"] + 1
 df_describe
 
 # %%
-l = df_describe.groupby("group").prod().astype(int)
+l = df_describe.groupby("group").sum().astype(int)
 l["count"] = l["count"] - 1
 l
 # %%

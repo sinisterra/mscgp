@@ -27,9 +27,19 @@ CRAMER_THRESHOLD = 0.08
 PATHFINDER_R = 50
 P_VALUE_THRESHOLD = 0.001
 COVER_MODE = "a"
-APTITUDE_FN = ("support", "confidence")
+APTITUDE_FN = (
+    # "support",
+    # "confidence",
+    # "lift",
+    "absolute_risk",
+    "r_absolute_risk",
+    # "susceptibility",
+    # "paf",
+)
 MEASURES = (*APTITUDE_FN,)
+refs = {"relative_risk": 1000, "lift": 1000}
 OPTIMIZE = tuple(["max" for _ in MEASURES])
+REFERENCE_POINTS = tuple([refs.get(t, 1) + 0.1 for t in APTITUDE_FN])
 # OPTIMIZE = ("max",)
 # OPTIMIZE = (
 #     # "min",
@@ -38,7 +48,7 @@ OPTIMIZE = tuple(["max" for _ in MEASURES])
 # )
 WORKERS = 6
 SEED = 0
-TOTAL_RUNS = 1
+TOTAL_RUNS = 5
 run_start = int(time.time())
 run_path = f"./results/{run_start}"
 os.makedirs(run_path, exist_ok=True)
@@ -95,7 +105,7 @@ yes_no_variables = [
 #     workers=8,
 # )
 
-g_location = {"ENTIDAD_UM", "ATN_MISMA_ENTIDAD"}
+g_location = {"ENTIDAD_UM", "ATN_MISMA_ENTIDAD", "SECTOR"}
 g_health_facility = {"INTUBADO", "UCI", "DEFUNCION", "TIPO_PACIENTE"}
 g_demographics = {
     "EDAD",
@@ -158,10 +168,63 @@ g_a_others = {"NEUMONIA", "OTRA_COM", "INDIGENA", "HABLA_LENGUA_INDIG", "OTRO_CA
 
 g_a_health_facility = {"SECTOR", "NACIONALIDAD", "MIGRANTE"}
 
+g0 = {
+    "ASMA",
+    "INMUSUPR",
+    "TABAQUISMO",
+    "OBESIDAD",
+    "RENAL_CRONICA",
+    "EPOC",
+    "CARDIOVASCULAR",
+    "DIABETES",
+    "HIPERTENSION",
+    "CLASIFICACION_FINAL",
+}
+g1 = {
+    "EDAD",
+    "EPOCH_FECHA_DEF",
+    "DEFUNCION",
+    "INTUBADO",
+    "TOMA_MUESTRA_ANTIGENO",
+    "TOMA_MUESTRA_LAB",
+    "UCI",
+    "TIPO_PACIENTE",
+}
+g3 = {
+    "ORIGEN",
+    "RESULTADO_ANTIGENO",
+    "EPOCH_FECHA_INGRESO",
+    "EPOCH_FECHA_SINTOMAS",
+    "RESULTADO_LAB",
+}
+
 sg_pairs = [
-    # (g_diseases, g_health_facility)
+    (g_demographics, g_diseases),
+    # (g_diseases, g_health_facility),
+    # (g_location, g_diseases),
+    # (g0, g1),
+    # (g0, g3),
+    # (g1, g3),
     # (g_health_facility, g_diseases),
-    (g_demographics, g_diseases)
+    # (
+    #     {
+    #         "DEFUNCION",
+    #         "EDAD",
+    #         "EPOCH_FECHA_DEF",
+    #         "INTUBADO",
+    #         "TIPO_PACIENTE",
+    #         "TOMA_MUESTRA_ANTIGENO",
+    #         "TOMA_MUESTRA_LAB",
+    #         "UCI",
+    #     },
+    #     {
+    #         "RESULTADO_ANTIGENO",
+    #         "RESULTADO_LAB",
+    #         "ORIGEN",
+    #         "EPOCH_FECHA_SINTOMAS",
+    #         "EPOCH_FECHA_INGRESO",
+    #     },
+    # )
     # (g_diseases, g_demographics,)
     # (g_location, g_tests)
     # (g_demographics, g_health_facility),
@@ -217,11 +280,12 @@ def do_run(args, constants):
 
     ctx = Context(
         id=cid,
+        seed=seed,
         dataframe=dataset,
         exec_run_path=exec_run_path,
         covariates=(),
         pop_size=50,
-        stop_condition=("check_convergence", 50),
+        stop_condition=("n_gen", 50),
         omit=(),
         antecedent=(1, len(a)),
         consequent=(1, len(b)),
@@ -231,6 +295,7 @@ def do_run(args, constants):
         use_groups=True,
         groups=(tuple(a), tuple(b),),
         aptitude_fn=APTITUDE_FN,
+        reference_points=REFERENCE_POINTS,
         selector_restrictions=(
             (tuple(yes_no_variables), ("keep", (1,)),),
             (
@@ -244,10 +309,11 @@ def do_run(args, constants):
                 ),
                 ("remove", ("?",),),
             ),
+            (("RESULTADO_ANTIGENO", "RESULTADO_LAB"), ("remove", (97,))),
             # (("ATN_MISMA_ENTIDAD",), ("keep", (2,))),
             (("INTUBADO", "UCI"), ("keep", (1,))),
             (("DEFUNCION",), ("keep", (1, 2))),
-            # (("CLASIFICACION_FINAL",), ("keep", (3, 6, 7))),
+            (("CLASIFICACION_FINAL",), ("keep", (3, 7))),
         ),
     )
 
@@ -359,7 +425,7 @@ def do_run(args, constants):
 seeds = range(1, TOTAL_RUNS + 1)
 run_inputs = itertools.product(enumerate(seeds), enumerate([p for p in sg_pairs]))
 
-pool = Pool()
+pool = Pool(WORKERS)
 mapped = pool.map(functools.partial(do_run, constants=base_constants), run_inputs)
 
 df_finals = pd.concat(mapped)
@@ -371,7 +437,7 @@ cols = [
     *(["level"] if len(MEASURES) > 1 else []),
     "aptitude",
     "absolute_risk",
-    # "r_absolute_risk",
+    "r_absolute_risk",
     "af_e",
     "paf",
     "support",
@@ -381,6 +447,8 @@ cols = [
     "antecedent_support",
     "consequent_support",
     "relative_risk",
+    "susceptibility",
+    "paf",
     # "r_confidence",
     # "cer",
     # "r_cer",

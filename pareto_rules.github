@@ -1,0 +1,22 @@
+| repr                                                                                                              |   level |   absolute_risk |   r_absolute_risk |
+|-------------------------------------------------------------------------------------------------------------------|---------|-----------------|-------------------|
+| [NEUMONIA = 1] -> [DEFUNCION = 1][INTUBADO = 1][UCI = 1]                                                          |       1 |            0.03 |              0.89 |
+| [NEUMONIA = 1] -> [DEFUNCION = 1][UCI = 1]                                                                        |       1 |            0.05 |              0.86 |
+| [NEUMONIA = 1] -> [INTUBADO = 1][TIPO_PACIENTE = 2][UCI = 1]                                                      |       1 |            0.05 |              0.85 |
+| [NEUMONIA = 1] -> [DEFUNCION = 1][INTUBADO = 1]                                                                   |       1 |            0.1  |              0.81 |
+| [NEUMONIA = 1] -> [INTUBADO = 1][TIPO_PACIENTE = 2]                                                               |       1 |            0.12 |              0.78 |
+| [NEUMONIA = 1] -> [DEFUNCION = 1][TIPO_PACIENTE = 2]                                                              |       1 |            0.35 |              0.66 |
+| [NEUMONIA = 1] -> [DEFUNCION = 1]                                                                                 |       1 |            0.37 |              0.65 |
+| [CLASIFICACION_FINAL = 3][NEUMONIA = 1] -> [DEFUNCION = 1][TIPO_PACIENTE = 2]                                     |       1 |            0.42 |              0.51 |
+| [NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                                                                             |       1 |            0.78 |              0.5  |
+| [CLASIFICACION_FINAL = 3][NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                                                    |       1 |            0.8  |              0.33 |
+| [HIPERTENSION = 1][NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                                                           |       1 |            0.84 |              0.19 |
+| [DIABETES = 1][NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                                                               |       1 |            0.85 |              0.16 |
+| [CLASIFICACION_FINAL = 3][HIPERTENSION = 1][NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                                  |       1 |            0.85 |              0.13 |
+| [CLASIFICACION_FINAL = 3][DIABETES = 1][NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                                      |       1 |            0.86 |              0.11 |
+| [CLASIFICACION_FINAL = 3][DIABETES = 1][HIPERTENSION = 1][NEUMONIA = 1] -> [TIPO_PACIENTE = 2]                    |       1 |            0.86 |              0.07 |
+| [DIABETES = 1][NEUMONIA = 1][RENAL_CRONICA = 1] -> [TIPO_PACIENTE = 2]                                            |       1 |            0.86 |              0.02 |
+| [CLASIFICACION_FINAL = 3][NEUMONIA = 1][RENAL_CRONICA = 1] -> [TIPO_PACIENTE = 2]                                 |       1 |            0.86 |              0.02 |
+| [CLASIFICACION_FINAL = 3][HIPERTENSION = 1][NEUMONIA = 1][RENAL_CRONICA = 1] -> [TIPO_PACIENTE = 2]               |       1 |            0.87 |              0.01 |
+| [CLASIFICACION_FINAL = 3][DIABETES = 1][NEUMONIA = 1][RENAL_CRONICA = 1] -> [TIPO_PACIENTE = 2]                   |       1 |            0.87 |              0.01 |
+| [CLASIFICACION_FINAL = 3][DIABETES = 1][HIPERTENSION = 1][NEUMONIA = 1][RENAL_CRONICA = 1] -> [TIPO_PACIENTE = 2] |       1 |            0.87 |              0.01 |

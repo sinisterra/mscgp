@@ -1,0 +1,16 @@
+graph G {
+    node [style="rounded,filled" shape="rect" fontname="IBM Plex Sans" ]
+    edge [fontname="IBM Plex Sans"]
+    layout="circo"
+    0 [fillcolor="#e57373"]
+    1 [fillcolor="#7986cb"]
+    2 [fillcolor="#fff176"]
+    3 [fillcolor="#aed581"]
+    4 [fillcolor="#ba68c8"]
+    5 [fillcolor="#64b5f6"]
+    6 [fillcolor="#ffb300"]
+    0 -- {1, 2, 3, 6}
+    1 -- {2, 3, 4, 5}
+    3 -- 5
+    4 -- 5
+}

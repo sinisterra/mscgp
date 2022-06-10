@@ -1,9 +1,10 @@
 # %%
-
+from functools import lru_cache
 from io_helpers import get_dataframe
 from clickhouse_io import get_selectors as clickhouse_get_selectors
 
 
+@lru_cache(maxsize=None)
 def get_selectors(ctx):
     selectors = clickhouse_get_selectors(ctx.dataframe)
     filtered_selectors = {**selectors}
@@ -23,11 +24,10 @@ def get_selectors(ctx):
                             filtered_res.append(sel)
 
                 filtered_selectors[elem] = filtered_res
-        # str_valid_selectors = [str(s) for s in valid_selectors]
-        # for e in restriction:
-        #     if e in filtered_selectors:
-        #         filtered_selectors[e] = [
-        #             s for s in filtered_selectors[e] if str(s[1]) in str_valid_selectors
-        #         ]
+
+    # count how many selectors remain after filtering
+    selectors_in_groups = [*ctx.groups[0], *ctx.groups[1]]
+    total_selectors = sum([len(filtered_selectors[e]) for e in selectors_in_groups])
+    print(total_selectors)
 
     return filtered_selectors

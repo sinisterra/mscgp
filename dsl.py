@@ -6,6 +6,7 @@ import pandas as pd
 @dataclass(frozen=True)
 class Context:
     id: int
+    seed: int
     exec_run_path: str
     antecedent: Tuple[int, int]
     consequent: Tuple[int, int]
@@ -20,7 +21,8 @@ class Context:
     use_groups: bool
     selector_restrictions: Tuple[Tuple[str, ...], Tuple[str, ...]]
     cover_mode: str
-    aptitude_fn: Tuple[str,...]
+    aptitude_fn: Tuple[str, ...]
+    reference_points: Tuple[float, ...]
 
 
 @dataclass(frozen=True)

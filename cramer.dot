@@ -1,4 +1,10 @@
 strict graph  {
+  node [style="rounded,filled" shape="rect" fontname="IBM Plex Sans"]
+edge [fontname="IBM Plex Sans"]
+layout="neato"
+overlap="f"
+outputorder=edgesfirst
+mode=KK
 ASMA [color="#e57373"];
 INMUSUPR [color="#e57373"];
 TABAQUISMO [color="#e57373"];

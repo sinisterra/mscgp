@@ -312,7 +312,7 @@ def do_evaluate_rule(table, rule):
 
     else:
         end = time.time()
-        print(f"{round(end - start, 4)}s\t{repr_rule(rule)}")
+        # print(f"{round(end - start, 4)}s\t{repr_rule(rule)}")
         evaluation = apply_evaluation(table, rule)
         to_redis(alias, evaluation)
         return evaluation
@@ -369,7 +369,7 @@ def evaluate_rule(ctx: Context, rule):
             # "has_redundant_selectors": all(
             #     [rule_support != s[0] and s[0] > 0 for s in subsets]
             # ),
-            "aptitude": abs(acc["absolute_risk"])
+            "aptitude": aptitude
             # "aptitude": ((1 / (1 + acc["prevalence_threshold_diff"])) * acc["paf"])
             # ** (0.5)
             # "aptitude": aptitude,

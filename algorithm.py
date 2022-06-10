@@ -7,7 +7,7 @@ from elitism_op import do_elitism, do_mo_elitism, do_selector_elitism, do_single
 from filtering_op import do_filtering, do_max_filtering
 import numpy as np
 import pygmo as pg
-from scipy.stats import zscore
+from scipy.stats import zscore, variation
 from mutation_op import (
     do_contraction_mutation,
     do_extension_mutation,
@@ -94,11 +94,10 @@ def make_initial_state(ctx: Context):
 
 def check_convergence(ctx: Context, state):
     (stop_criteria, stop_value) = ctx.stop_condition
-
-    generations = sorted(state.history["generation"].unique())
+    generations = sorted(state.pop_history["generation"].unique())
 
     last_n_generations = [
-        g for g in generations[-(min(stop_value, len(generations))) :] if g >= 0
+        g for g in generations[-(min(stop_value, max(0, state.generation))) :] if g >= 0
     ]
 
     if len(ctx.measures) > 1:
@@ -115,8 +114,10 @@ def check_convergence(ctx: Context, state):
             # print(tabulate(dfpareto, headers="keys"))
             hv_value = pg.hypervolume(
                 pareto[list(ctx.measures)].values.tolist()
-            ).compute([1.1, 1.1])
+            ).compute(list(ctx.reference_points))
             acc_hv.append(round(hv_value, 4))
+            s = np.std(acc_hv)
+            m = np.mean(acc_hv)
             stds.append(np.std(acc_hv))
 
             xs.append(g)
@@ -125,7 +126,16 @@ def check_convergence(ctx: Context, state):
         std = np.std(acc_hv)
         print(f"[{state.generation}] hypervolumes std = {std}",)
         # fig.plot(xs, stds, label="std")
-        print(plotille.plot(xs, acc_hv, width=120, height=16, origin=False))
+        print(
+            tabulate(
+                pd.DataFrame({"generation": xs, "hypervolume": acc_hv}).sort_values(
+                    "generation", ascending=False
+                ),
+                headers="keys",
+                showindex="never",
+            )
+        )
+        # print(plotille.plot(xs, acc_hv, width=120, height=16, origin=False))
         # print(plotille.plot(xs, ys))
         # fig = tpl.figure()
         # fig.plot(xs, stds, label="std")
@@ -133,7 +143,12 @@ def check_convergence(ctx: Context, state):
         # fig.show()
         if len(generations) < stop_value:
             return False
-        return std <= 0.0001
+        should_stop = std <= 0.001
+        if should_stop:
+            pd.DataFrame(
+                [{"total_generations": state.generation + 1, "run_id": ctx.id}]
+            ).to_csv(f"{ctx.exec_run_path}/total_generations.csv", index=False)
+        return should_stop
 
         # obtener los ultimos n de la población élite
     acc_elites = []
@@ -141,23 +156,45 @@ def check_convergence(ctx: Context, state):
     ys = []
     stds = []
     for g in last_n_generations:
-        gen_pop = state.pop_history.query(f"generation == {g}")
+        gen_pop = state.elites.query(
+            f"generation == {g} and significant == True and absolute_risk > 0 and tp > 0"
+        )
         y = gen_pop[ctx.measures[0]].max()
         acc_elites.append(y)
-        stds.append(round(np.std(acc_elites), 4))
+
+        stds.append(round(variation(acc_elites), 3))
         xs.append(g)
         ys.append(y)
 
     # fig.plot(xs, stds, label="std")
-    print(plotille.plot(xs, stds, width=120, height=16, origin=False))
-
-    std = round(np.std(acc_elites), 4)
-    print(f"[{state.generation}] CONVERGENCE CHECK {std}")
-
+    # print(plotille.plot(xs, stds, width=120, height=16, origin=False))
+    # generations = sorted(state.history["generation"].unique())
+    print(
+        tabulate(
+            pd.DataFrame({"generation": xs, "value": ys}).sort_values(
+                "generation", ascending=False
+            ),
+            headers="keys",
+            showindex="never",
+        )
+    )
+    std = round(variation(acc_elites), 4)
+    should_stop = (
+        float(std) <= 0.001
+        and (state.generation > stop_value)
+        and state.generation > 50
+    )
+    print(
+        f"[{state.generation}] CONVERGENCE CHECK CV = {std} STD = {round(np.std(acc_elites),3)} MEAN = {round(np.mean(acc_elites), 3)}"
+    )
     if len(generations) < stop_value:
         return False
 
-    return std <= 0.0001
+    if should_stop:
+        pd.DataFrame(
+            [{"total_generations": state.generation, "run_id": ctx.id}]
+        ).to_csv(f"./{ctx.exec_run_path}/total_generations.csv", index=False)
+    return should_stop
 
 
 def stop_condition_met(ctx, state):
@@ -328,8 +365,6 @@ def evolve_t(ctx, state, start_time):
     time_df["context"] = ctx.id
     time_df = time_df[["event", "duration", "rules"]]
     time_df["duration"] = time_df["duration"].round(4)
-    print(tabulate(time_df, headers="keys", tablefmt="psql"))
-
     is_mono = len(ctx.measures) == 1
     # print(final_population[["repr", "absolute_risk_rev"]])
     df_print = (
@@ -374,8 +409,8 @@ def evolve_t(ctx, state, start_time):
         # "susceptibility",
         *ctx.aptitude_fn,
         "aptitude",
-        "significant",
-        "absolute_risk",
+        # "significant",
+        # "absolute_risk",
         "full_support"
         # "absolute_risk_abs",
         # "full_support",
@@ -408,11 +443,14 @@ def evolve_t(ctx, state, start_time):
                 "FS",
                 "TOP10",
             ]
-        ].reset_index(drop=True),
-        # .query("DIV == '*'"),
+        ]
+        .reset_index(drop=True)
+        .query("level == 1"),
+        # .head(1),
+        # .query("TOP10 == '*'"),
         # .query(f"{should_include_pareto}FS == '*' or DIV == '*'"),
         headers="keys",
-        tablefmt="pgsql",
+        tablefmt="psql",
         showindex=False,
     )
 
@@ -423,8 +461,9 @@ def evolve_t(ctx, state, start_time):
     #     showindex=False,
     # )
     print(
-        f"[{str(ctx.id).zfill(3)}] - Generation {state.generation}\t ({len(state.history)} rules) [+{total_new_offspring}] {(str(round(end-start,2))).zfill(2)}s {str(round(end - start_time, 2)).zfill(2)}s\n"
+        f"[{str(ctx.id).zfill(3)}, {str(ctx.seed).zfill(3)}] - Generation {state.generation}\t ({len(state.history)} rules) [+{total_new_offspring}] {(str(round(end-start,2))).zfill(2)}s {str(round(end - start_time, 2)).zfill(2)}s\n"
         + f"{table_result}\n\n"
+        + f"{tabulate(time_df, headers='keys', tablefmt='psql', showindex='never')}\n\n"
         # + f"{simplification_result}\n\n"
     )
 
