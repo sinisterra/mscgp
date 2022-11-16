@@ -1,9 +1,16 @@
-# Causal Rule Miner
+# COVID-19 Data Analysis with Multi-objective Evolutionary Algorithm for Causal Association Rules Mining
 
-Written by Santiago Sinisterra Sierra.
+Supplementary Material for article _COVID-19 Data Analysis with Multi-objective
+Evolutionary Algorithm for Causal Association Rules Mining_ in Mathematical and
+Computational Applications journal, Special Issue "Evolutionary Multi-objective
+Optimization: An Honorary Issue Dedicated to Professor Kalyanmoy Deb"
 
-Centro de Investigación en Computación (CIC-IPN), Instituto Politécnico
-Nacional, Mexico.
+Authors: Santiago Sinisterra-Sierra [1], Salvador Godoy-Calderón [1] and
+Miriam Pescador-Rojas [2]
+
+[1] Centro de Investigación en Computación, Instituto Politécnico Nacional, Ciudad
+de México, México;
+[2] Escuela Superior de Cómputo, Instituto Politécnico Nacional, Ciudad de México, México.
 
 ## Installation
 
@@ -25,3 +32,10 @@ named with the timestamp of the execution. The file `selection.csv` contains the
 results of the algorithm. For further exploration of more evaluation measures,
 `finals.csv` contains all the possible evaluation measures considered by the
 algorithm.
+
+<!-- ## Contributions
+
+Code by Santiago Sinisterra Sierra.
+
+Centro de Investigación en Computación (CIC-IPN), Instituto Politécnico
+Nacional, Mexico. -->
