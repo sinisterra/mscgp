@@ -118,9 +118,26 @@ mss = [
     "paf",
     "full_support",
 ]
+
+label_problem_mapping = {
+    "support": 1,
+    "confidence": 2,
+    "lift": 3,
+    "support, confidence, lift": 4,
+    "absolute_risk": 5,
+    "r_absolute_risk": 6,
+    "absolute_risk, r_absolute_risk": 7,
+    "susceptibility": 8,
+    "paf": 9,
+    "susceptibility, paf": 10,
+}
+scenario_id_mapping = {0: "A", 1: "B", 2: "C", 10: "D", 11: "E", 12: "F"}
+
 for (key, measure, scenario, label) in executions:
     acc = []
     df = pd.read_csv(f"./results/{key}/selection.csv")
+    exp_name = f"{scenario_id_mapping[scenario]}{label_problem_mapping[label]}"
+    df.to_csv(f"./mono_results/{exp_name}.csv", index=False)
 
     for s in df["seed"].unique():
         df_run = df.query(f"seed == {s}").sort_values(

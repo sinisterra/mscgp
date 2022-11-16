@@ -31,10 +31,10 @@ APTITUDE_FN = (
     # "support",
     # "confidence",
     # "lift",
-    "absolute_risk",
-    "r_absolute_risk",
-    # "susceptibility",
-    # "paf",
+    # "absolute_risk",
+    # "r_absolute_risk",
+    "susceptibility",
+    "paf",
 )
 MEASURES = (*APTITUDE_FN,)
 refs = {"relative_risk": 1000, "lift": 1000}
@@ -77,25 +77,6 @@ yes_no_variables = [
     # "DEFUNCION",
 ]
 
-# yes_no_variables = [
-#     "semi_finished_bread",
-#     "white_bread",
-#     "brown_bread",
-#     "instant_coffee",
-#     "coffee",
-#     "tea",
-#     # "Ni",
-#     # "Co",
-#     # "Mo",
-#     # "CoMo",
-#     # "hds",
-#     # "Al2O3",
-#     # "Fe",
-#     # "V",
-#     # "W",
-#     # "oxidative",
-# ]
-
 # USE SEMANTIC GROUPS
 # (semantic_groups, sg_pairs) = semantic_group_discovery(
 #     dataset,
@@ -105,7 +86,11 @@ yes_no_variables = [
 #     workers=8,
 # )
 
-g_location = {"ENTIDAD_UM", "ATN_MISMA_ENTIDAD", "SECTOR"}
+g_location = {
+    "ENTIDAD_UM",
+    # "ATN_MISMA_ENTIDAD"
+    "SECTOR",
+}
 g_health_facility = {"INTUBADO", "UCI", "DEFUNCION", "TIPO_PACIENTE"}
 g_demographics = {
     "EDAD",
@@ -199,9 +184,9 @@ g3 = {
 }
 
 sg_pairs = [
-    (g_demographics, g_diseases),
+    # (g_demographics, g_diseases),
     # (g_diseases, g_health_facility),
-    # (g_location, g_diseases),
+    (g_location, g_diseases),
     # (g0, g1),
     # (g0, g3),
     # (g1, g3),

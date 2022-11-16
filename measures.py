@@ -18,6 +18,8 @@ import itertools
 from tabulate import tabulate
 from rule_repr import repr_selectors
 
+from wave import OLA
+
 np.seterr(all="ignore")
 r = redis.StrictRedis(host="localhost", port=6379, db=0)
 
@@ -305,7 +307,7 @@ def apply_evaluation(table, rule):
 
 @lru_cache(maxsize=None)
 def do_evaluate_rule(table, rule):
-    alias = repr_rule(rule)
+    alias = str(OLA) + repr_rule(rule)
     start = time.time()
     if from_redis_exists(alias):
         return from_redis(alias)

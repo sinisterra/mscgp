@@ -24,6 +24,7 @@ results = [
     (1651952496, "F", 3),
 ]
 
+
 # por cada resultado, extraer...
 # la longitud del frente de pareto
 # los extremos: la regla de mayor aptitud en cada extremo
@@ -37,7 +38,10 @@ problems = {
 acc_lengths = []
 acc_extremes = []
 for (key, scenario, problem) in results:
-    df = pd.read_csv(f"./results/{key}/selection.csv").query("level == 1")
+    df = pd.read_csv(f"./results/{key}/selection.csv")
+    df.to_csv(f"./multi_results/{scenario}{problem}.csv", index=False)
+
+    df = df.query("level == 1")
     problem_measures = problems[problem]
 
     for (i, s) in enumerate(df["seed"].unique()):

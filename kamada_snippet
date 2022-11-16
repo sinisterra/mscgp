@@ -1,3 +1,6 @@
 node [style="rounded,filled" shape="rect" fontname="IBM Plex Sans"]
 edge [fontname="IBM Plex Sans"]
-layout=circo
+layout=neato
+overlap=f
+outputorder="edgesfirst"
+mode=kk
