@@ -27,7 +27,7 @@ def get_attributes(table):
 
 
 def get_crosstab(table, a1, a2, filtered=""):
-    query = f"SELECT count(*) as cnt, {a1}, {a2} FROM {table} WHERE OLA == {OLA} and {filtered if filtered else ''}   GROUP BY {a1}, {a2}"
+    query = f"SELECT count(*) as cnt, {a1}, {a2} FROM {table} WHERE {filtered if filtered else ''}   GROUP BY {a1}, {a2}"
     cl = client()
     print(query)
     result = cl.execute(query)
@@ -53,7 +53,7 @@ def get_selectors(table):
 
 def total_records(table):
     cl = client()
-    res = cl.execute(f"SELECT count(*) as cnt from {table} WHERE OLA == {OLA}")[0][0]
+    res = cl.execute(f"SELECT count(*) as cnt from {table}")[0][0]
     cl.disconnect()
     return res
 
@@ -62,9 +62,7 @@ def total_records(table):
 def _compute_selector_support(table, selectors):
     selectors = " AND ".join([f"{a} == '{v}'" for (a, v) in selectors])
     cl = client()
-    result = cl.execute(
-        f"SELECT count(*) as cnt FROM {table} WHERE {selectors} AND OLA == {OLA}"
-    )
+    result = cl.execute(f"SELECT count(*) as cnt FROM {table} WHERE {selectors}")
     support = result[0][0]
     cl.disconnect()
     return support
@@ -89,7 +87,7 @@ def compute_certainty(support, confidence):
 def query_rule(table, attributes, filtered=""):
     str_attributes = ", ".join(attributes)
 
-    query = f"SELECT count(*) as count, {str_attributes} FROM {table} {filtered if filtered else ''} WHERE OLA == {OLA} GROUP BY {str_attributes} ORDER BY count DESC "
+    query = f"SELECT count(*) as count, {str_attributes} FROM {table} {filtered if filtered else ''} GROUP BY {str_attributes} ORDER BY count DESC "
 
     cl = client()
     res = cl.execute(query)

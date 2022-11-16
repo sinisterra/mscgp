@@ -48,7 +48,7 @@ REFERENCE_POINTS = tuple([refs.get(t, 1) + 0.1 for t in APTITUDE_FN])
 # )
 WORKERS = 6
 SEED = 0
-TOTAL_RUNS = 5
+TOTAL_RUNS = 1
 run_start = int(time.time())
 run_path = f"./results/{run_start}"
 os.makedirs(run_path, exist_ok=True)
@@ -185,8 +185,8 @@ g3 = {
 
 sg_pairs = [
     # (g_demographics, g_diseases),
-    # (g_diseases, g_health_facility),
-    (g_location, g_diseases),
+    (g_diseases, g_health_facility),
+    # (g_location, g_diseases),
     # (g0, g1),
     # (g0, g3),
     # (g1, g3),

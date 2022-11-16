@@ -88,7 +88,7 @@ def do_crossover(ctx: Context, state: AlgorithmState):
 
 
 def sample_in_bounds(l, bounds):
-    return random.sample(l, k=min(len(l), random.randint(*bounds)))
+    return random.sample(list(l), k=min(len(l), random.randint(*bounds)))
 
 
 def do_crossover_(ctx: Context, state):

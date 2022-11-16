@@ -6,7 +6,8 @@ import termplotlib as tpl
 from elitism_op import do_elitism, do_mo_elitism, do_selector_elitism, do_single_elitism
 from filtering_op import do_filtering, do_max_filtering
 import numpy as np
-import pygmo as pg
+
+# import pygmo as pg
 from scipy.stats import zscore, variation
 from mutation_op import (
     do_contraction_mutation,
@@ -112,9 +113,10 @@ def check_convergence(ctx: Context, state):
             pareto = state.elites.query(f"generation == {g} and level == 1")
             dfpareto = pareto[["repr", "level", *ctx.measures, "generation"]]
             # print(tabulate(dfpareto, headers="keys"))
-            hv_value = pg.hypervolume(
-                pareto[list(ctx.measures)].values.tolist()
-            ).compute(list(ctx.reference_points))
+            # hv_value = pg.hypervolume(
+            #     pareto[list(ctx.measures)].values.tolist()
+            # ).compute(list(ctx.reference_points))
+            hv_value = 0
             acc_hv.append(round(hv_value, 4))
             s = np.std(acc_hv)
             m = np.mean(acc_hv)

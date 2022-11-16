@@ -1,5 +1,8 @@
 clickhouse-driver
 termplotlib
 matching
-scipy==1.8.0
-pygmo
+scipy
+redis
+python-sat
+plotille
+more_itertools
